@@ -1,4 +1,7 @@
+import asyncio
 from src.game import Game
 
-if __name__ == "__main__":
-    Game().run()
+async def main():
+    await Game().run()
+
+asyncio.run(main())
