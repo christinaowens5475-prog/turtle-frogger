@@ -82,7 +82,7 @@ class Game:
         for i in range(p.lives):
             self.screen.blit(self.small_font.render("♥", True, RED), (340 + i * 22, 18))
         if p.invincible:
-            txt = self.small_font.render(f"INVINCIBLE! {p.inv_timer // 60 + 1}s", True, YELLOW)
+            txt = self.small_font.render(f"INVINCIBLE! {(p.inv_timer + 59) // 60}s", True, YELLOW)
             self.screen.blit(txt, (200, 38))
         # Mute button
         btn_color = DARK_GRAY if music.is_muted() else (60, 120, 60)
