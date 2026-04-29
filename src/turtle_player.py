@@ -16,7 +16,7 @@ CELEBRATE_DURATION = 180   # 3 seconds at 60 fps
 class TurtlePlayer:
     def __init__(self):
         self.x = 5
-        self.y = 10
+        self.y = 9
         self.lives = 5
         self.score = 0
         self.invincible    = False
@@ -30,7 +30,7 @@ class TurtlePlayer:
         if direction == "up" and self.y > 0:
             self.y -= 1
             self.score += 10
-        elif direction == "down" and self.y < 10:
+        elif direction == "down" and self.y < 9:
             self.y += 1
         elif direction == "left" and self.x > 0:
             self.x -= 1
@@ -121,7 +121,7 @@ class TurtlePlayer:
 
     def reset_position(self):
         self.x = 5
-        self.y = 10
+        self.y = 9
 
     def take_hit(self):
         self.lives -= 1

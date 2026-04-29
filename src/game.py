@@ -45,7 +45,7 @@ class Game:
     # ── Drawing helpers ───────────────────────────────────────
 
     def _draw_road_lanes(self):
-        for row in range(1, 11):
+        for row in range(1, 9):
             y = row * GRID_SIZE + 60
             pygame.draw.rect(self.screen, (30, 30, 30), (0, y, SCREEN_WIDTH, GRID_SIZE))
             for dx in range(0, SCREEN_WIDTH, 40):
@@ -67,13 +67,20 @@ class Game:
         txt = self.small_font.render("🐸  SWIM TO SAFETY  🐸", True, WHITE)
         self.screen.blit(txt, (SCREEN_WIDTH // 2 - 100, y + 38))
 
-    def _draw_start_zone(self):
-        sx = 5 * GRID_SIZE
-        sy = 10 * GRID_SIZE + 60
-        pygame.draw.rect(self.screen, START_GREEN, (sx, sy, GRID_SIZE, GRID_SIZE), border_radius=6)
-        pygame.draw.rect(self.screen, YELLOW,      (sx, sy, GRID_SIZE, GRID_SIZE), 3, border_radius=6)
-        lbl = self.small_font.render("START", True, WHITE)
-        self.screen.blit(lbl, (sx + GRID_SIZE // 2 - lbl.get_width() // 2, sy + GRID_SIZE // 2 - lbl.get_height() // 2))
+    def _draw_start_pond(self):
+        y = 9 * GRID_SIZE + 60
+        pygame.draw.rect(self.screen, POND_BLUE, (0, y, SCREEN_WIDTH, GRID_SIZE))
+        for i in range(4):
+            rx = 80 + i * 130
+            pygame.draw.ellipse(self.screen, POND_DARK, (rx - 35, y + 10, 70, 40), 2)
+            pygame.draw.ellipse(self.screen, POND_DARK, (rx - 20, y + 18, 40, 22), 2)
+        for lx in [50, 170, 300, 430, 550]:
+            pygame.draw.ellipse(self.screen, LILY_GREEN, (lx - 15, y + 15, 30, 22))
+            pygame.draw.polygon(self.screen, POND_BLUE,  [(lx, y + 26), (lx - 6, y + 15), (lx + 6, y + 15)])
+            pygame.draw.circle(self.screen,  WHITE,      (lx, y + 26), 4)
+            pygame.draw.circle(self.screen,  YELLOW,     (lx, y + 26), 2)
+        txt = self.small_font.render("🐢  START HERE  🐢", True, WHITE)
+        self.screen.blit(txt, (SCREEN_WIDTH // 2 - 90, y + 38))
 
     def _draw_hud(self):
         p = self.player
@@ -101,7 +108,7 @@ class Game:
         self.screen.fill(BLACK)
         self._draw_pond()
         self._draw_road_lanes()
-        self._draw_start_zone()
+        self._draw_start_pond()
         for v in self.vehicles:
             v.draw(self.screen)
         self.powerup.draw(self.screen, self.font)

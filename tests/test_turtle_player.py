@@ -30,10 +30,10 @@ def test_move_down_increments_y(player):
     assert player.y == 6
 
 
-def test_move_down_clamps_at_ten(player):
-    player.y = 10
+def test_move_down_clamps_at_nine(player):
+    player.y = 9
     player.move("down")
-    assert player.y == 10
+    assert player.y == 9
 
 
 def test_move_left_decrements_x(player):
@@ -101,7 +101,7 @@ def test_flash_expires_and_resets_position(player):
         player.update()
     assert player.flashing is False
     assert player.x == 5
-    assert player.y == 10
+    assert player.y == 9
 
 
 # Celebration
@@ -133,7 +133,7 @@ def test_reset_position(player):
     player.y = 0
     player.reset_position()
     assert player.x == 5
-    assert player.y == 10
+    assert player.y == 9
 
 
 # Collision rect

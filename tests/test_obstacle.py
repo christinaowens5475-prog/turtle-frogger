@@ -102,12 +102,23 @@ def test_powerup_reset():
     assert pu.spawn_timer == 600
 
 
+# PowerUp spawn range
+
+def test_powerup_never_spawns_on_start_pond():
+    """PowerUp must not spawn on row 9 (the start pond)."""
+    import random
+    random.seed(42)
+    for _ in range(200):
+        pu = PowerUp()
+        assert pu.y != 9, f"PowerUp spawned on start pond row 9 (y={pu.y})"
+
+
 # make_vehicles
 
-def test_make_vehicles_covers_rows_1_to_9():
+def test_make_vehicles_covers_rows_1_to_8():
     vehicles = make_vehicles(1)
     rows = {v.row for v in vehicles}
-    assert rows == set(range(1, 10))
+    assert rows == set(range(1, 9))
 
 
 def test_make_vehicles_speed_scales_with_level():

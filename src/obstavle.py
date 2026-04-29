@@ -67,7 +67,7 @@ class PowerUp:
 
     def _spawn(self):
         self.x      = random.randint(0, 9)
-        self.y      = random.randint(1, 9)
+        self.y      = random.randint(1, 8)
         self.active = True
         self.timer  = 300
 
@@ -105,7 +105,7 @@ def make_vehicles(level):
     spd      = 1 + (level - 1) * 0.3
     vehicles = []
 
-    for row in range(1, 10):
+    for row in range(1, 9):
         direction = 1 if row % 2 == 0 else -1
         lane_spd  = round(spd * direction * random.uniform(0.8, 1.2), 2)
 
