@@ -136,6 +136,27 @@ def test_reset_position(player):
     assert player.y == 9
 
 
+# Character selection
+
+def test_player_defaults_to_turtle():
+    assert TurtlePlayer().character == "turtle"
+
+def test_player_accepts_frog():
+    assert TurtlePlayer(character="frog").character == "frog"
+
+def test_player_accepts_beaver():
+    assert TurtlePlayer(character="beaver").character == "beaver"
+
+def test_character_does_not_affect_starting_position():
+    for char in ("turtle", "frog", "beaver"):
+        p = TurtlePlayer(character=char)
+        assert p.x == 5 and p.y == 9, f"{char}: expected start (5,9)"
+
+def test_character_does_not_affect_lives():
+    for char in ("turtle", "frog", "beaver"):
+        assert TurtlePlayer(character=char).lives == 5
+
+
 # Collision rect
 
 def test_get_rect_pixel_bounds(player):
