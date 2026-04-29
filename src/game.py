@@ -3,7 +3,6 @@ import pygame
 
 from .turtle_player import TurtlePlayer
 from .obstavle import make_vehicles, PowerUp
-from . import music
 
 SCREEN_WIDTH  = 600
 SCREEN_HEIGHT = 660
@@ -15,7 +14,6 @@ YELLOW     = (255, 220, 0)
 BLACK      = (0,   0,   0)
 RED        = (200, 30,  30)
 GRAY       = (50,  50,  50)
-DARK_GRAY  = (80,  80,  80)
 LILY_GREEN = (0,   160, 60)
 
 # (main_fill, ripple_outline) per level — cycles when level > palette length
@@ -34,9 +32,6 @@ _POND_PALETTE = [
 def _pond_colors_for_level(level):
     return _POND_PALETTE[(level - 1) % len(_POND_PALETTE)]
 
-# HUD mute button
-_MUTE_RECT = pygame.Rect(SCREEN_WIDTH - 90, 10, 80, 38)
-
 # Title screen "Ready to Start" button
 _READY_RECT = pygame.Rect(200, 400, 200, 54)
 
@@ -50,7 +45,6 @@ _CHAR_CARDS = {
 
 class Game:
     def __init__(self):
-        pygame.mixer.pre_init(44100, -16, 2, 512)
         pygame.init()
         self.screen     = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
         pygame.display.set_caption("Turtle Frogger")
@@ -69,7 +63,6 @@ class Game:
         self.vehicles = []
         self.powerup  = None
 
-        music.init()
 
     # ── State transitions ─────────────────────────────────────
 
@@ -90,7 +83,6 @@ class Game:
         self.player   = TurtlePlayer(character=self.selected_character)
         self.vehicles = make_vehicles(self.level)
         self.powerup  = PowerUp()
-        music.init()
         self.state = "playing"
 
     # ── Title screen ──────────────────────────────────────────
@@ -237,12 +229,6 @@ class Game:
                 f"INVINCIBLE! {(p.inv_timer + 59) // 60}s", True, YELLOW
             )
             self.screen.blit(txt, (200, 38))
-        btn_color = DARK_GRAY if music.is_muted() else (60, 120, 60)
-        pygame.draw.rect(self.screen, btn_color, _MUTE_RECT, border_radius=6)
-        pygame.draw.rect(self.screen, WHITE,     _MUTE_RECT, 2, border_radius=6)
-        label = "MUTED" if music.is_muted() else "MUSIC"
-        self.screen.blit(self.small_font.render(label, True, WHITE),
-                         (_MUTE_RECT.x + 10, _MUTE_RECT.y + 10))
 
     def _draw_level_up(self):
         txt = self.font.render("LEVEL UP!", True, YELLOW)
@@ -273,7 +259,6 @@ class Game:
         self.screen.blit(self.small_font.render("Restarting...", True, GRAY),
                          (SCREEN_WIDTH // 2 - 55, 370))
         pygame.display.flip()
-        music.stop()
         for _ in range(4 * FPS):
             await asyncio.sleep(0)
             for event in pygame.event.get():
@@ -293,9 +278,6 @@ class Game:
                 for event in pygame.event.get():
                     if event.type == pygame.QUIT:
                         self._running = False
-                    music.handle_event(event)
-                    if event.key == pygame.K_m if event.type == pygame.KEYDOWN else False:
-                        music.toggle_mute()
                     if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
                         if _READY_RECT.collidepoint(event.pos):
                             self.state = "select"
@@ -305,9 +287,6 @@ class Game:
                 for event in pygame.event.get():
                     if event.type == pygame.QUIT:
                         self._running = False
-                    music.handle_event(event)
-                    if event.key == pygame.K_m if event.type == pygame.KEYDOWN else False:
-                        music.toggle_mute()
                     if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
                         for char, rect in _CHAR_CARDS.items():
                             if rect.collidepoint(event.pos):
@@ -321,18 +300,12 @@ class Game:
                 for event in pygame.event.get():
                     if event.type == pygame.QUIT:
                         self._running = False
-                    music.handle_event(event)
                     if event.type == pygame.KEYDOWN:
-                        if event.key == pygame.K_m:
-                            music.toggle_mute()
                         if not p.flashing and not p.celebrating:
                             if   event.key == pygame.K_UP:    p.move("up")
                             elif event.key == pygame.K_DOWN:  p.move("down")
                             elif event.key == pygame.K_LEFT:  p.move("left")
                             elif event.key == pygame.K_RIGHT: p.move("right")
-                    if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
-                        if _MUTE_RECT.collidepoint(event.pos):
-                            music.toggle_mute()
 
                 for v in self.vehicles:
                     v.update()
