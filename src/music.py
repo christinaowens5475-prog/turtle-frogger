@@ -1,3 +1,5 @@
+import math as _math
+import array as _array
 import pygame
 
 try:
@@ -33,28 +35,49 @@ _muted           = False
 _music_available = False
 
 
-def _make_tone(freq, duration_ms, volume=0.30):
-    frames = int(duration_ms / 1000 * SAMPLE_RATE)
+def _make_tone_numpy(freq, frames, volume):
     if freq == 0 or frames == 0:
         wave = np.zeros((frames, 2), dtype=np.int16)
         return pygame.sndarray.make_sound(wave)
-
-    t    = np.linspace(0, duration_ms / 1000, frames, False)
+    t    = np.linspace(0, frames / SAMPLE_RATE, frames, False)
     wave = np.sign(np.sin(2 * np.pi * freq * t))
     wave += 0.4 * np.sign(np.sin(4 * np.pi * freq * t))
-
     release = min(int(0.12 * frames), frames)
-    wave[-release:] *= np.linspace(1, 0, release)
-
+    if release > 0:
+        wave[-release:] *= np.linspace(1, 0, release)
     wave = np.clip(wave / 1.4 * volume * 32767, -32767, 32767).astype(np.int16)
     return pygame.sndarray.make_sound(np.column_stack([wave, wave]))
 
 
+def _make_tone_pure(freq, frames, volume):
+    # Silence
+    data = _array.array('h', bytes(frames * 4))
+    if freq == 0 or frames == 0:
+        return pygame.mixer.Sound(buffer=data)
+    release = min(int(0.12 * frames), frames)
+    tau  = 2.0 * _math.pi * freq / SAMPLE_RATE
+    tau2 = tau * 2.0
+    scale = volume / 1.4 * 32767.0
+    for i in range(frames):
+        raw = (_math.copysign(1.0, _math.sin(tau * i)) +
+               0.4 * _math.copysign(1.0, _math.sin(tau2 * i)))
+        factor = (frames - 1 - i) / release if (release > 0 and i >= frames - release) else 1.0
+        s = max(-32767, min(32767, int(raw * factor * scale)))
+        data[i * 2]     = s
+        data[i * 2 + 1] = s
+    return pygame.mixer.Sound(buffer=data)
+
+
+def _make_tone(freq, duration_ms, volume=0.30):
+    frames = int(duration_ms / 1000 * SAMPLE_RATE)
+    if _NUMPY_OK:
+        return _make_tone_numpy(freq, frames, volume)
+    return _make_tone_pure(freq, frames, volume)
+
+
 def init():
-    """Pre-generate note sounds and start the music timer. Silently skipped if numpy/sndarray unavailable."""
+    """Pre-generate note sounds and start the music timer."""
     global _music_available
-    if not _NUMPY_OK:
-        return
     try:
         pygame.mixer.set_num_channels(8)
         for name, freq in _NOTES.items():
