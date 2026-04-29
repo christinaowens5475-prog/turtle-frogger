@@ -16,9 +16,23 @@ BLACK      = (0,   0,   0)
 RED        = (200, 30,  30)
 GRAY       = (50,  50,  50)
 DARK_GRAY  = (80,  80,  80)
-POND_BLUE  = (30,  144, 255)
-POND_DARK  = (0,   90,  180)
 LILY_GREEN = (0,   160, 60)
+
+# (main_fill, ripple_outline) per level — cycles when level > palette length
+_POND_PALETTE = [
+    ((30,  144, 255), (0,   90,  180)),  # 1 — blue
+    ((0,   200, 200), (0,   130, 140)),  # 2 — cyan
+    ((20,  190,  90), (0,   130,  55)),  # 3 — emerald
+    ((160,  60, 230), (100,  20, 170)),  # 4 — purple
+    ((230, 120,  20), (170,  70,   0)),  # 5 — orange
+    ((230,  50, 150), (170,  10, 100)),  # 6 — pink
+    ((220,  40,  40), (160,  10,  10)),  # 7 — red
+    ((220, 190,   0), (160, 130,   0)),  # 8 — gold
+]
+
+
+def _pond_colors_for_level(level):
+    return _POND_PALETTE[(level - 1) % len(_POND_PALETTE)]
 
 # HUD mute button
 _MUTE_RECT = pygame.Rect(SCREEN_WIDTH - 90, 10, 80, 38)
@@ -181,14 +195,15 @@ class Game:
 
     def _draw_pond(self):
         y = 60
-        pygame.draw.rect(self.screen, POND_BLUE, (0, y, SCREEN_WIDTH, GRID_SIZE))
+        pond, ripple = _pond_colors_for_level(self.level)
+        pygame.draw.rect(self.screen, pond, (0, y, SCREEN_WIDTH, GRID_SIZE))
         for i in range(4):
             rx = 80 + i * 130
-            pygame.draw.ellipse(self.screen, POND_DARK, (rx - 35, y + 10, 70, 40), 2)
-            pygame.draw.ellipse(self.screen, POND_DARK, (rx - 20, y + 18, 40, 22), 2)
+            pygame.draw.ellipse(self.screen, ripple, (rx - 35, y + 10, 70, 40), 2)
+            pygame.draw.ellipse(self.screen, ripple, (rx - 20, y + 18, 40, 22), 2)
         for lx in [50, 170, 300, 430, 550]:
             pygame.draw.ellipse(self.screen, LILY_GREEN, (lx - 15, y + 15, 30, 22))
-            pygame.draw.polygon(self.screen, POND_BLUE,  [(lx, y + 26), (lx - 6, y + 15), (lx + 6, y + 15)])
+            pygame.draw.polygon(self.screen, pond,       [(lx, y + 26), (lx - 6, y + 15), (lx + 6, y + 15)])
             pygame.draw.circle(self.screen,  WHITE,      (lx, y + 26), 4)
             pygame.draw.circle(self.screen,  YELLOW,     (lx, y + 26), 2)
         txt = self.small_font.render("🐸  SWIM TO SAFETY  🐸", True, WHITE)
@@ -196,14 +211,15 @@ class Game:
 
     def _draw_start_pond(self):
         y = 9 * GRID_SIZE + 60
-        pygame.draw.rect(self.screen, POND_BLUE, (0, y, SCREEN_WIDTH, GRID_SIZE))
+        pond, ripple = _pond_colors_for_level(self.level)
+        pygame.draw.rect(self.screen, pond, (0, y, SCREEN_WIDTH, GRID_SIZE))
         for i in range(4):
             rx = 80 + i * 130
-            pygame.draw.ellipse(self.screen, POND_DARK, (rx - 35, y + 10, 70, 40), 2)
-            pygame.draw.ellipse(self.screen, POND_DARK, (rx - 20, y + 18, 40, 22), 2)
+            pygame.draw.ellipse(self.screen, ripple, (rx - 35, y + 10, 70, 40), 2)
+            pygame.draw.ellipse(self.screen, ripple, (rx - 20, y + 18, 40, 22), 2)
         for lx in [50, 170, 300, 430, 550]:
             pygame.draw.ellipse(self.screen, LILY_GREEN, (lx - 15, y + 15, 30, 22))
-            pygame.draw.polygon(self.screen, POND_BLUE,  [(lx, y + 26), (lx - 6, y + 15), (lx + 6, y + 15)])
+            pygame.draw.polygon(self.screen, pond,       [(lx, y + 26), (lx - 6, y + 15), (lx + 6, y + 15)])
             pygame.draw.circle(self.screen,  WHITE,      (lx, y + 26), 4)
             pygame.draw.circle(self.screen,  YELLOW,     (lx, y + 26), 2)
         txt = self.small_font.render("🐢  START HERE  🐢", True, WHITE)
